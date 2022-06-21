@@ -79,3 +79,11 @@ func (d *TinyMap) Reset() {
 func b2s(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
+
+func (d *TinyMap) VisitValues(visitor func([]byte, interface{})) {
+	arr := *d
+	for i, n := 0, len(arr); i < n; i++ {
+		kv := &arr[i]
+		visitor(kv.key, kv.value)
+	}
+}

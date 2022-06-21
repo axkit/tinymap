@@ -1,6 +1,7 @@
 package tinymap
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"testing"
@@ -22,12 +23,17 @@ func TestTinyMap(t *testing.T) {
 		testTinyMapGet(t, &u, key, i)
 	}
 
+	testTinyMapVisitValues(t, &u)
+
 	u.Reset()
+
+	testTinyMapVisitValues(t, &u)
 
 	for i := 0; i < 10; i++ {
 		key := []byte(fmt.Sprintf("key_%d", i))
 		testTinyMapGet(t, &u, key, nil)
 	}
+
 }
 
 func testTinyMapGet(t *testing.T, u *TinyMap, key []byte, value interface{}) {
@@ -38,6 +44,21 @@ func testTinyMapGet(t *testing.T, u *TinyMap, key []byte, value interface{}) {
 	if !reflect.DeepEqual(v, value) {
 		t.Fatalf("unexpected value for key=%q: %d. Expecting %d", key, v, value)
 	}
+}
+
+func testTinyMapVisitValues(t *testing.T, u *TinyMap) {
+	i := 0
+	u.VisitValues(func(key []byte, val interface{}) {
+		arr := *u
+		if !bytes.Equal(key, arr[i].key) {
+			t.Fatalf("unexpected key for item[%d]. Expecting %q, got %q", i, arr[i].key, key)
+		}
+
+		if !reflect.DeepEqual(arr[i].value, val) {
+			t.Fatalf("unexpected value for key=%q: %v. Expecting %v", key, val, arr[i].value)
+		}
+		i++
+	})
 }
 
 func TestTinyMapValueClose(t *testing.T) {
