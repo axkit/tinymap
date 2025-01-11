@@ -69,8 +69,17 @@ func main() {
 You can compare the performance of `tinymap` against standard Go maps by running the provided benchmarks:
 
 ```sh
-$ go test -bench .
+$ go test -bench . -benchmem
+goos: linux
+goarch: amd64
+pkg: github.com/axkit/tinymap
+cpu: Intel(R) Core(TM) i7-6700HQ CPU @ 2.60GHz
+BenchmarkTinyMapCustom-8        53070952                20.79 ns/op            0 B/op          0 allocs/op
+BenchmarkTinyMapStdMap-8        30541206                37.11 ns/op            0 B/op          0 allocs/op
+PASS
+ok      github.com/axkit/tinymap        2.306s
 ```
+
 
 ## API Reference
 
