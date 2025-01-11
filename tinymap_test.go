@@ -8,36 +8,36 @@ import (
 )
 
 func TestTinyMap(t *testing.T) {
-	var u TinyMap
+	var tm TinyMap
 
 	for i := 0; i < 10; i++ {
 		key := []byte(fmt.Sprintf("key_%d", i))
-		u.SetBytes(key, i+5)
-		testTinyMapGet(t, &u, key, i+5)
-		u.SetBytes(key, i)
-		testTinyMapGet(t, &u, key, i)
+		tm.SetBytes(key, i+5)
+		testTinyMapGet(t, &tm, key, i+5)
+		tm.SetBytes(key, i)
+		testTinyMapGet(t, &tm, key, i)
 	}
 
 	for i := 0; i < 10; i++ {
 		key := []byte(fmt.Sprintf("key_%d", i))
-		testTinyMapGet(t, &u, key, i)
+		testTinyMapGet(t, &tm, key, i)
 	}
 
-	testTinyMapVisitValues(t, &u)
+	testTinyMapVisitValues(t, &tm)
 
-	u.Reset()
+	tm.Reset()
 
-	testTinyMapVisitValues(t, &u)
+	testTinyMapVisitValues(t, &tm)
 
 	for i := 0; i < 10; i++ {
 		key := []byte(fmt.Sprintf("key_%d", i))
-		testTinyMapGet(t, &u, key, nil)
+		testTinyMapGet(t, &tm, key, nil)
 	}
 
 }
 
-func testTinyMapGet(t *testing.T, u *TinyMap, key []byte, value interface{}) {
-	v := u.GetBytes(key)
+func testTinyMapGet(t *testing.T, tm *TinyMap, key []byte, value interface{}) {
+	v := tm.GetBytes(key)
 	if v == nil && value != nil {
 		t.Fatalf("cannot obtain value for key=%q", key)
 	}
@@ -46,10 +46,10 @@ func testTinyMapGet(t *testing.T, u *TinyMap, key []byte, value interface{}) {
 	}
 }
 
-func testTinyMapVisitValues(t *testing.T, u *TinyMap) {
+func testTinyMapVisitValues(t *testing.T, tm *TinyMap) {
 	i := 0
-	u.VisitValues(func(key []byte, val interface{}) {
-		arr := *u
+	tm.VisitValues(func(key []byte, val interface{}) {
+		arr := *tm
 		if !bytes.Equal(key, arr[i].key) {
 			t.Fatalf("unexpected key for item[%d]. Expecting %q, got %q", i, arr[i].key, key)
 		}
@@ -62,23 +62,23 @@ func testTinyMapVisitValues(t *testing.T, u *TinyMap) {
 }
 
 func TestTinyMapValueClose(t *testing.T) {
-	var u TinyMap
+	var tm TinyMap
 
 	closeCalls := 0
 
 	// store values implementing io.Closer
 	for i := 0; i < 5; i++ {
 		key := fmt.Sprintf("key_%d", i)
-		u.Set(key, &closerValue{&closeCalls})
+		tm.Set(key, &closerValue{&closeCalls})
 	}
 
 	// store values without io.Closer
 	for i := 0; i < 10; i++ {
 		key := fmt.Sprintf("key_noclose_%d", i)
-		u.Set(key, i)
+		tm.Set(key, i)
 	}
 
-	u.Reset()
+	tm.Reset()
 
 	if closeCalls != 5 {
 		t.Fatalf("unexpected number of Close calls: %d. Expecting 10", closeCalls)
